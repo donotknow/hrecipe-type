@@ -1,9 +1,9 @@
 === hRecipe ===
 Contributors: doolin
-Tags: recipe, recipes, recipe seo, hrecipe, editor, microformat, microformats, microformatting
+Tags: recipe, recipes, recipe seo, hrecipe, editor, microformat, microformats, microformatting, unobtrusive javascript, unobtrusive, javascript, food, cooking, food preparation 
 Requires at least: 3.0
-Tested up to: 3.1.2
-Stable tag: 0.5.8.5
+Tested up to: 3.2
+Stable tag: 0.5.9.1
 
 Use hRecipe for creating Google Rich Snippets, for leveraging SEO results, and for attractively displaying your recipes.
 
@@ -91,6 +91,20 @@ microformat.
 
 
 == Changelog ==
+
+= 0.5.9.1 = 
+* Blunder: Forgot to add `hrecipe_launch.js` to repository for 0.5.9.0. Now added.
+
+= 0.5.9.0 =
+* Moved css styling into for entry navigation into editor css file.
+* Removed custom styling for thickbox tabs in favor of WP-builtin. Looks the same, easier to maintain.
+* Started splitting out Javascript, turning it into UJS with some jQuery help.
+* localized page hook to get postbox handling into UJS.
+* Change class `mealtype` to `recipeType`, which is supported by rich snippets.
+* Fixed a css problem where hrecipe `div.inside` was overriding WP native css. Thanks to Tom Coady (http://web-tart.co.uk/) for pointing this out and suggesting the fix.
+* Added nutrition information with calories, fat and protein.
+* User-derived custom css now works.
+
 
 = 0.5.8.5 =
 * Closing donations for now, will reopen later.

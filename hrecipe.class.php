@@ -111,11 +111,12 @@ class hrecipe extends PluginBase {
         //wp_register_script('hrecipe-reciply', 'http://www.recip.ly/static/js/jquery-reciply.js');
         //wp_enqueue_script('hrecipe-reciply');
         wp_register_script('hrecipeformat',plugins_url('hrecipe/js/hrecipe_format.js', dirname(__FILE__)),'','',true);
-        wp_localize_script('hrecipeformat','hrecipe_handle',hrecipe_localize_vars());
+        wp_register_script('hrecipelaunch',plugins_url('hrecipe/js/hrecipe_launch.js', dirname(__FILE__)),'','',true);
         wp_register_script('hrecipescript',plugins_url('hrecipe/js/hrecipescript.js', dirname(__FILE__)),'','',true);
+        wp_register_style('hrecipe_editor_stylesheet',plugins_url('hrecipe/hrecipe-editor.css', dirname(__FILE__)),'','');
 
-        wp_enqueue_script('hrecipeformat');                
-        //wp_enqueue_script('hrecipescript');                
+        wp_enqueue_script('hrecipeformat');
+        //wp_enqueue_script('hrecipescript');
 
         // add the recipe custom post type
         $this->hrecipe_register_post_type('hrecipe', __FILE__);
@@ -133,6 +134,15 @@ class hrecipe extends PluginBase {
         // create a template file just in case the theme doesn't have one
         add_action('template_redirect', array($this, 'recipe_template_redirect'), 5);
     }
+
+
+   function hrecipe_admin_init() {
+      
+        wp_enqueue_script('hrecipeformat');
+        wp_enqueue_script('hrecipelaunch');
+        wp_enqueue_style('hrecipe_editor_stylesheet');
+    }
+    
     
     function register_mysettings() {
 
@@ -143,7 +153,8 @@ class hrecipe extends PluginBase {
         add_settings_section('hrecipe_structure', '', 'hrecipe_structure_text', $hrecipe_options_file);        
 
         add_settings_section('hrecipe_styling', '', array($this,'hrecipe_styling_text'), $hrecipe_options_file);
-        add_settings_field('hrecipe_border_color', __('Border color', 'hrecipe'), array($this,'border_color'), $hrecipe_options_file, 'hrecipe_styling');        
+        add_settings_field('hrecipe_custom_style', __('Custom CSS class', 'hrecipe'), array($this,'custom_style'), $hrecipe_options_file, 'hrecipe_styling');        
+        //add_settings_field('hrecipe_border_color', __('Border color', 'hrecipe'), array($this,'border_color'), $hrecipe_options_file, 'hrecipe_styling');        
         //add_settings_field('hrecipe_background_color', 'Background color', array($this,'background_color'), $hrecipe_options_file, 'hrecipe_styling');        
     }
 
@@ -362,6 +373,14 @@ class hrecipe extends PluginBase {
         }
     }
 
+  function custom_style() {
+    
+    $options = get_option('hrecipe_options');
+    echo "Add the styling for your custom class in your theme's style.css, or create your own recipe styling plugin.";  
+    echo " Your custom css class will be automatically added to the recipe output.<br />";
+    echo "<input id='hrecipe_custom_style' name='hrecipe_options[custom_style]' size='40' type='text' value='{$options['custom_style']}' />";
+  }
+
   function bordercolor() {
   }
 
@@ -414,11 +433,16 @@ class hrecipe extends PluginBase {
             global $hrecipe_pagehook;
             $hrecipe_pagehook = add_options_page('hRecipe Options', 'hRecipe', 'administrator', $hrecipe_options_file, array($this, 'hrecipe_plugin_options_page'));
             add_action('load-'.$hrecipe_pagehook, array($this,'on_load_page'));
+            // For plugins, admin_menu fires before admin_init, so we set the 
+            // page hook variable for our spiffy UJS. See the Codex:
+            // http://codex.wordpress.org/Plugin_API/Action_Reference
+            wp_localize_script('hrecipeformat','hrecipe_handle',hrecipe_localize_vars());
         }
     }
 
 
     function on_load_page() {
+      
         wp_enqueue_script('common');
         wp_enqueue_script('wp-lists');
         wp_enqueue_script('postbox');
@@ -454,6 +478,8 @@ class hrecipe extends PluginBase {
         return $buttons;
     }
 
+
+    // TODO: Schedule for deletion...
     function hrecipe_plugin_footer() {
 
         // TODO: Wrap to load only on post or page editing admin pages.
@@ -461,6 +487,7 @@ class hrecipe extends PluginBase {
         wp_enqueue_script('hrecipeformat');
     }
 
+    // TODO: Schedule for deletion...
     function add_hrecipe_stylesheet() {
 
         // TODO: Replace constants with plugins_url()
@@ -472,14 +499,20 @@ class hrecipe extends PluginBase {
         }
     }
 
+    // TODO: Schedule for deletion...
     function add_hrecipe_editor_stylesheet() {
 
+       wp_enqueue_style('hrecipe_editor_stylesheet');
+       
+       /*
         $css_url = WP_PLUGIN_URL.'/hrecipe/hrecipe-editor.css';
         $css_file = WP_PLUGIN_DIR.'/hrecipe/hrecipe-editor.css';
         if (file_exists($css_file)) {
             wp_register_style('hrecipe_editor_stylesheet', $css_url);
             wp_enqueue_style('hrecipe_editor_stylesheet');
         }
+        */
+        
     }
 
 }

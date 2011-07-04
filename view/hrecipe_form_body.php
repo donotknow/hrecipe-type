@@ -1,17 +1,13 @@
-<div class="wrap">
-<h2><?php _e('New Semantic Recipe','hrecipe'); ?></h2>
 
 
-<div>
+<div id="media-upload-header">
   
-  <div id="hrecipe-tab-wrapper">
-  <!-- div id="sidemenu" -->
-    <ul class="tabs">
+    <ul id="sidemenu" class="tabs">
       <li><a class="tab-1" href="#tab-1">Ingredients/Instructions</a></li>
-      <li><a class="tab-2" href="#tab-2">More Details</a></li>
+      <li><a class="tab-2" href="#tab-2">Nutrition</a></li>
       <li><a class="tab-3" href="#tab-3">Notes/Variations</a></li>
     </ul>
-  </div><!-- tabbed menu wrapper -->
+</div>
 
 <form name="recipeForm">
 
@@ -89,7 +85,7 @@
 </table>
 
 <ul class="tabs bottom">
-  <li class="btmtabs" style="float:right; display:inline;"><a href="#" onclick="javascript:submitForm()">Insert</a></li>
+  <li class="btmtabs" style="float:right; display:inline;"><a class="hrecipe-ujs" href="#">Insert</a></li>
   <li class="btmtabs" style="float:right; display:inline;"><a href="#tab-2">More...</a></li>
 </ul>
 
@@ -101,9 +97,24 @@
 <table class="form-table">
 
 <tr valign="top">
+<th scope="row"><?php _e('Calories','hrecipe'); ?></th>
+<td><input type="text" id="item-calories" size="5" /></td>
+</tr>
+
+<tr valign="top">
+<th scope="row"><?php _e('Fat','hrecipe'); ?></th>
+<td><input type="text" id="item-fat" size="5" /></td>
+</tr>
+
+<tr valign="top">
+<th scope="row"><?php _e('Protein','hrecipe'); ?></th>
+<td><input type="text" id="item-protein" size="5" /></td>
+</tr>
+
+<tr valign="top">
 <th scope="row"><?php _e('Recipe type:','hrecipe'); ?></th>
 <td>
-<select id="item-mealtype">
+<select id="item-recipetype">
 <option></option>
 <option><?php _e('breakfast','hrecipe'); ?></option>
 <option><?php _e('lunch','hrecipe'); ?></option>
@@ -200,7 +211,7 @@
 
 <ul class="tabs bottom">
   <li class="btmtabs"><a href="#tab-1">Back</a></li>
-  <li class="btmtabs" style="float:right; display:inline;"><a href="#" onclick="javascript:submitForm()">Insert</a></li>
+  <li class="btmtabs" style="float:right; display:inline;"><a class="hrecipe-ujs" href="#">Insert</a></li>
   <li class="btmtabs" style="float:right; display:inline;"><a href="#tab-3">More...</a></li>
 </ul>
 </div>
@@ -223,10 +234,9 @@
 </table>
 <ul class="tabs bottom">
   <li class="btmtabs"><a href="#tab-2">Back</a></li>
-  <li class="btmtabs" style="float:right; display:inline;"><a href="#" onclick="javascript:submitForm()">Insert</a></li>
+  <li class="btmtabs" style="float:right; display:inline;"><a class="hrecipe-ujs" href="#">Insert</a></li>
 </ul>
 </div>
 
 
 </form>
-</div>

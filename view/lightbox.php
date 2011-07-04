@@ -20,15 +20,12 @@ require_once('../../../../wp-admin/admin.php');
 
   wp_enqueue_style( 'global' );
   wp_enqueue_style( 'wp-admin' );
-  // post.php loads thickbox.css after global.css and wp-admin.css
-  wp_enqueue_style( 'thickbox' );
-  
-  //wp_enqueue_style( 'colors' );
-  // Try something new
-  wp_enqueue_style( 'colors-fresh' );
+  wp_enqueue_style( 'media' );
+  wp_enqueue_style( 'colors' );
   wp_enqueue_style( 'ie' );
+  // Maybe not needed, handled with admin_print_styles hook.
+  //wp_enqueue_style('hrecipe_editor_stylesheet');
 ?>
-
 
 <script type="text/javascript">
 //<![CDATA[
@@ -51,240 +48,9 @@ isRtl = <?php echo (int) is_rtl(); ?>;
 //]]>
 </script>
 
-
-<!-- Tabs CSS -->
-<!-- -->
-<style type="text/css">
-
-div#hrecipe-tab-wrapper {
-    background-color: #F9F9F9;
-    border-bottom-color: #DFDFDF;
-    
-    border-bottom-style: solid;
-    border-bottom-width: 1px;
-    font-weight: bold;
-    margin: 0;
-    padding: 0 5px;
-    position: relative;
-    color: #333333;
-    line-height: 1.4em;
-    font-family: "Lucida Grande",Verdana,Arial,"Bitstream Vera Sans",sans-serif;
-    font-size: 13px;    
-}
-
-
-ul.tabs {
-
-    bottom: -1px;
-    float: none;
-    font-weight: normal;
-    left: 0;
-    margin: 0px 5px;
-    overflow: hidden;
-    font-size: 12px;
-    list-style: none outside none;
-    padding-left: 10px;
-    position: relative;
-}
-
-ul.tabs li {
-
-    display: inline;
-    line-height: 200%;
-    list-style: none outside none;
-    margin: 0;
-    padding: 0;
-    text-align: center;
-    white-space: nowrap;
-}
-
-ul.tabs li a {
-
-    background-color: #F9F9F9;
-    border-color: #F9F9F9 #F9F9F9 #DFDFDF;
-
-    border-bottom-style: solid;
-    border-bottom-width: 1px;
-    border-top-style: solid;
-    border-top-width: 1px;
-    display: block;
-    float: left;
-    line-height: 28px;
-    padding: 0 7px;
-    text-decoration: none;
-
-}
-
-ul.tabs li a.current {
-  background-color: #FFFFFF;
-  border-color: #DFDFDF #DFDFDF #FFFFFF;
- -moz-border-radius: 4px 4px 0 0;
-  border-radius: 4px 4px 0 0;
-  color: #d54e21;
-  border-style: solid;
-  border-width: 1px;
-  font-weight: normal;
-  padding-left: 6px;
-  padding-right: 6px;
-}
-
-
-ul.tabs.bottom {
-  background-color: transparent;
-  margin-top: 50px;
-  border: 0px;
-}
-
-ul.tabs li.btmtabs {
-	background: transparent;
-	border:0px;
-	height:50px;
-}
-
-ul.tabs li.btmtabs a{
-	border: 1px solid #999;
-	border-bottom:1px solid #999;
-	width:50px;
-	font-size:11px;
-	text-align:center;
-	background:#ddd;
-	margin-bottom:10px;
-	float:left; display:inline;
-	margin-left:15px;
-}
-
-ul.tabs li.btmtabs a:hover {
-	background:#ccc;
-}
-</style>
-<!-- -->
-<!-- end tabs CSS -->
-
-<script type="text/javascript">//<!CDATA[
-function clearForm() {
-	
-  document.getElementById('item-name').value = '';
-  document.getElementById('item-url').value = '';
-  document.getElementById('item-summary').value = '';
-  document.getElementById('item-ingredients').value = '';
-  document.getElementById('item-description').value = '';
-  document.getElementById('item-quicktnotes').value = '';
-  document.getElementById('item-variations').value = '';
-  document.getElementById('item-diettype').value = '';
-  document.getElementById('item-dietrestriction').value = '';
-  document.getElementById('item-culinarytradition').value = '';
-  document.getElementById('item-mealtype').value = '';
-  document.getElementById('item-servings').value = '';
-  document.getElementById('item-rating').value = '';
-  document.getElementById('item-duration').value = '';
-  document.getElementById('item-preptime').value = '';
-  document.getElementById('item-cooktime').value = '';
-}
-
-
-
-function getSelectValue(fieldId) {
-    
-  var selectItem = document.getElementById(fieldId);
-  var selectValue = selectItem.value;
-
-  if ("" != selectValue) {
-    return selectValue;
-  }
-  
-  // avoid bug in old browsers where they never give any value directly
-  var selectIdx = selectItem.selectedIndex;
-  selectValue = selectItem.options[selectIdx].value;
-
-  if ("" != selectValue) {
-    return selectValue;
-  }
-  
-  // and cope with IE
-  selectValue = (selectItem.options[selectIdx]).text;
-  return selectValue;
-}
-
-
-// Process the checkboxes here.
-// This can be processed as an 
-// arrary traversing id's and names later.
-// Suggestions welcome.
-// Move to hrecipe_format.js
-function getCheckedValues() {
-	
-	var need_comma = false;
-	var comma = ', ';
-	var diet = '';
-	if (document.getElementById('low_calorie').checked) { 
-	   diet += 'Low calorie';
-	   need_comma = true; 
-	}
-	if (document.getElementById('reduced_fat').checked) { 
-	   if (need_comma) diet += comma;
-	   diet += 'Reduced fat'; 
-	   need_comma = true; 
-	}
-	if (document.getElementById('reduced_carbohydrate').checked) { 
-	   if (need_comma) diet += comma;
-	   diet += 'Reduced carbohydrate'; 
-	   need_comma = true; 
-	}
-	if (document.getElementById('high_protein').checked) { 
-	   if (need_comma) diet += comma;
-	   diet += 'High protein'; 
-	   need_comma = true; 	   
-	}
-	if (document.getElementById('gluten_free').checked) { 
-	   if (need_comma) diet += comma;
-	   diet += 'Gluten free';
-	   need_comma = true; 	    
-	}
-	if (document.getElementById('raw').checked) { 
-	   if (need_comma) diet += comma;
-	   diet += 'Raw'; 
-	}
-
-	return  diet;
-}
-
-function recipe() {}
-
-function submitForm() {
-	
-   r = new recipe();
-   r["name"] = document.getElementById('item-name').value;
-
-   if ("" == r["name"]) {
-      alert("You need to provide a name for the recipe.");
-      return false;
-   }
-
-   r["url"] = document.getElementById('item-url').value;
-   r["summary"] = document.getElementById('item-summary').value;
-   r["ingredients"] = document.getElementById('item-ingredients').value;
-   r["description"] = document.getElementById('item-description').value;
-   
-   r["quicknotes"] = document.getElementById('item-quicknotes').value;
-   r["variations"] = document.getElementById('item-variations').value;
-       
-   r["tradition"] = getSelectValue('item-culinarytradition');
-   r["rating"] = getSelectValue('item-rating');
-
-   // When this id doesn't exist, call fails.
-   //r["duration"] = document.getElementById('item-duration').value;
-   r["preptime"] = document.getElementById('item-preptime').value;
-   r["cooktime"] = document.getElementById('item-cooktime').value;
-
-   r["diettype"] = getSelectValue('item-diettype');
-   r["mealtype"] = getSelectValue('item-mealtype');
-   r["dietother"] = getCheckedValues();
-   r["restriction"] = document.getElementById('item-dietrestriction').value; 
-   r["servings"] = document.getElementById('item-servings').value; 
-   
-   window.parent.edInsertHRecipeDone(r);
-}
-
+<script type="text/javascript">
+//<!CDATA[
+// Get rid of this or move it.
 function abortForm() {
   window.parent.edInsertHRecipeAbort();
 }
@@ -293,55 +59,21 @@ function abortForm() {
 
 <?php
 do_action('admin_print_styles');
+// TODO: Get this custom hook conencted.
+//do_action('hrecipe_admin_print_styles');
 do_action('admin_print_scripts');
 do_action('admin_head');
 ?>
 </head>
-<body<?php if ( isset($GLOBALS['body_id']) ) echo ' id="' . $GLOBALS['body_id'] . '"'; ?>>
+<!-- body<?php if ( isset($GLOBALS['body_id']) ) echo ' id="' . $GLOBALS['body_id'] . '"'; ?> -->
+<body id='media-upload'  class="js">
 <?php 
   include('hrecipe_form_body.php');
-?>
-<?php
   do_action('admin_print_footer_scripts');
 ?>
 <script type="text/javascript">
   if(typeof wpOnload=='function')
     wpOnload();
-</script>
-<script type="text/javascript">
-//<!CDATA[
-jQuery(document).ready(function() {
-
-  //Default Action
-  jQuery(".tab_content").hide(); //Hide all content
-  jQuery("ul.tabs li:first a").addClass("current").show(); //Activate first tab
-  jQuery(".tab_content:first").show(); //Show first tab content
-  
-  //On Click Event for the sidemenu across the media popup
-  jQuery("ul.tabs li a").click(function() {
-    jQuery("ul.tabs li a").removeClass("current"); 
-    jQuery(this).addClass("current"); 
-    jQuery(".tab_content").hide(); //Hide all tab content
-    var activeTab = jQuery(this).attr("href"); //Find the rel attribute value to identify the active tab + content
-    jQuery(activeTab).fadeIn(); //Fade in the active content
-    return false;
-  });
-  
-  // Handle the bottom tabs.
-  jQuery("ul.tabs li.btmtabs a").click(function() {
-    //alert("Bottom tab clicked " + this);
-    var activeTab = jQuery(this).attr("href"); //Find the rel attribute value to identify the active tab + content
-    //alert("Active tab: " + activeTab);
-    jQuery("ul.tabs li a").removeClass("current"); 
-    //alert("ul.tabs li a."+activeTab.substring(1));
-    jQuery("ul.tabs li a."+activeTab.substring(1)).addClass("current"); 
-    jQuery(".tab_content").hide(); //Hide all tab content
-    jQuery(activeTab).fadeIn(); //Fade in the active content
-    return false;
-  });
-  
-});
-//]]>
 </script>
 
 </body>

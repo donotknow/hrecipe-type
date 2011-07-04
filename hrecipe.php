@@ -3,7 +3,7 @@
  * Plugin Name: hRecipe Type
  * Plugin URI: https://github.com/donotknow/hrecipe-type
  * Description: hRecipe custom post type to wordpress: Fast and easy recipe formatting for Google Rich Snippet display and better search results click throughs. Leverage your recipe SEO with the hrecipe microformatting! It's easy using hRecipe plugin for WordPress. Visit the plugin home page for tips and techniques on food blogging, SEO and more.
- * Version: 0.5.8.5
+ * Version: 0.5.9.1
  * Author: Dave Doolin
  * Author URI: http://hrecipe.com/about
  */ 
@@ -35,7 +35,7 @@
    */
 
    
-define('HRECIPE_VERSION', "5.8");   
+define('HRECIPE_VERSION', "5.9");   
    
 // Find the full URL to the plugin directory and store it
 // @todo define(HRECIPE_PLUGIN_URL) instead of this.
@@ -57,21 +57,23 @@ if ( isset ($recipe)) {
 
     register_activation_hook( __FILE__ , array (&$recipe, 'hrecipe_activate'));
     register_deactivation_hook( __FILE__ , array (&$recipe, 'hrecipe_deactivate'));
-    add_filter('plugin_action_links', 'plugin_links', 10, 2);
+    add_filter('plugin_action_links', 'hrecipe_plugin_links', 10, 2);
     $recipe->init();
         
     add_action('wp_print_styles', array ($recipe, 'add_hrecipe_stylesheet'));
-    add_action('wp_print_styles', array ($recipe, 'add_hrecipe_editor_stylesheet'));
-    add_action('admin_print_styles', array ($recipe, 'add_hrecipe_stylesheet'));
+    // Probably ought to split this out into admin style sheet.
+    add_action('admin_print_styles', array (&$recipe, 'add_hrecipe_stylesheet'));
+    //add_action('hrecipe_admin_print_styles', array (&$recipe, 'add_hrecipe_editor_stylesheet'));
 
     add_action('init', array ($recipe, 'hrecipe_plugin_init'));
     add_action('admin_init', array($recipe, 'register_mysettings'));
+    add_action('admin_init', array($recipe, 'hrecipe_admin_init'));
     add_action('admin_menu', array ($recipe, 'hrecipe_plugin_menu'));
 
    /**
      * Adds an action link to the Plugins page
      */
-    function plugin_links($links, $file) {
+    function hrecipe_plugin_links($links, $file) {
     	
         static $this_plugin;
         
@@ -80,7 +82,7 @@ if ( isset ($recipe)) {
 		    }
 		
         if ($file == $this_plugin) {
-            $settings_link = '<a href="admin.php?page=view/admin/options.php">'.__("Settings", "hrecipe").'</a>';
+            $settings_link = '<a href="options-general.php?page=view/admin/options.php">'.__("Settings", "hrecipe").'</a>';
             array_unshift($links, $settings_link);
         }
         

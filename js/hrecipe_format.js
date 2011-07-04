@@ -2,38 +2,100 @@
 /*global tb_show, hrecipe_handle, hrecipe_qttoolbar:true, document, newbutton:true, tb_remove, url */
 /*global tinyMCE, edInsertContent, edCanvas */
 
-
-
   var hrecipe_from_gui;
 
-  // TODO: rename these next two functions appropriately.
-  function edInsertHRecipe() {    
-    tb_show("Add an hRecipe", hrecipe_handle.PluginsUrl + "/view/lightbox.php?TB_iframe=true");
-    hrecipe_from_gui = true; /** Called from TinyMCE **/
+
+function clearForm() {
+  
+  document.getElementById('item-name').value = '';
+  document.getElementById('item-url').value = '';
+  document.getElementById('item-summary').value = '';
+  document.getElementById('item-ingredients').value = '';
+  document.getElementById('item-description').value = '';
+  document.getElementById('item-quicktnotes').value = '';
+  document.getElementById('item-variations').value = '';
+  document.getElementById('item-diettype').value = '';
+  document.getElementById('item-dietrestriction').value = '';
+  document.getElementById('item-culinarytradition').value = '';
+  document.getElementById('item-recipetype').value = '';
+  document.getElementById('item-servings').value = '';
+  document.getElementById('item-rating').value = '';
+  document.getElementById('item-duration').value = '';
+  document.getElementById('item-preptime').value = '';
+  document.getElementById('item-cooktime').value = '';
+  document.getElementById('item-calories').value = '';
+  document.getElementById('item-fat').value = '';
+  document.getElementById('item-protein').value = '';
+}
+
+
+function getSelectValue(fieldId) {
+    
+  var selectItem = document.getElementById(fieldId);
+  var selectValue = selectItem.value;
+
+  if ("" != selectValue) {
+    return selectValue;
+  }
+  
+  // avoid bug in old browsers where they never give any value directly
+  var selectIdx = selectItem.selectedIndex;
+  selectValue = selectItem.options[selectIdx].value;
+
+  if ("" != selectValue) {
+    return selectValue;
+  }
+  
+  // and cope with IE
+  selectValue = (selectItem.options[selectIdx]).text;
+  return selectValue;
+}
+
+
+// Process the checkboxes here.
+// This can be processed as an 
+// arrary traversing id's and names later.
+// Suggestions welcome.
+// Move to hrecipe_format.js
+function getCheckedValues() {
+  
+  var need_comma = false;
+  var comma = ', ';
+  var diet = '';
+  if (document.getElementById('low_calorie').checked) { 
+     diet += 'Low calorie';
+     need_comma = true; 
+  }
+  if (document.getElementById('reduced_fat').checked) { 
+     if (need_comma) diet += comma;
+     diet += 'Reduced fat'; 
+     need_comma = true; 
+  }
+  if (document.getElementById('reduced_carbohydrate').checked) { 
+     if (need_comma) diet += comma;
+     diet += 'Reduced carbohydrate'; 
+     need_comma = true; 
+  }
+  if (document.getElementById('high_protein').checked) { 
+     if (need_comma) diet += comma;
+     diet += 'High protein'; 
+     need_comma = true;      
+  }
+  if (document.getElementById('gluten_free').checked) { 
+     if (need_comma) diet += comma;
+     diet += 'Gluten free';
+     need_comma = true;       
+  }
+  if (document.getElementById('raw').checked) { 
+     if (need_comma) diet += comma;
+     diet += 'Raw'; 
   }
 
+  return  diet;
+}
 
-  function edInsertHRecipeCode() {
-    tb_show("Add an hRecipe", hrecipe_handle.PluginsUrl + "/view/lightbox.php?TB_iframe=true");
-    hrecipe_from_gui = false; /** Called from Quicktags **/
-  }
+function recipe() {}
 
-  hrecipe_qttoolbar = document.getElementById("ed_toolbar");
-
-
-  if (hrecipe_qttoolbar !== null) {
-    newbutton = document.createElement("input");
-    newbutton.type = "button";
-    newbutton.id = "ed_hrecipe";
-    newbutton.className = "ed_button";
-    newbutton.value = "hRecipe";
-    newbutton.onclick = edInsertHRecipeCode;
-    hrecipe_qttoolbar.appendChild(newbutton);
-  }
-
-  function edInsertHRecipeAbort() {
-    tb_remove();
-  } 
 
   
   function google_compliant_rating(itemRating) {
@@ -236,12 +298,13 @@
     var markup = '';
   
     if ("div" === et) {
-      markup += padding + '<div class="hrecipe">';
+      markup += padding + '<div class="hrecipe ' + hrecipe_handle.hrecipe_custom_style + '">';
+      // TODO: Deal with colon when recipe_text is empty.
       markup += '<h2 class="fn">' + hrecipe_handle.hrecipe_recipe_text  + ': ';
       markup += (itemURL ? '<a class="url" href="' + itemURL + '">' : '') + itemName + (itemURL ? '</a>' : '');
       markup += '</h2>';
     } else {
-      markup += padding + '<fieldset class="hrecipe">';
+      markup += padding + '<fieldset class="hrecipe ' + hrecipe_handle.hrecipe_custom_style + '">';
       markup += '<legend class="fn">' + hrecipe_handle.hrecipe_recipe_text  + ': ';
       markup += (itemURL ? '<a class="url" href="' + itemURL + '">' : '') + itemName + (itemURL ? '</a>' : '');
       markup += '</legend>';
@@ -257,6 +320,21 @@
   function reciply() {
     return '<div class="reciply-addtobasket-widget" href="' + url + '"></div>';
   }
+  
+  function hrecipe_format_nutrition(r) {
+    
+    var markup = '';
+    if (r.calories || r.fat || r.protein) {
+      markup += '<div class="nutrition">';
+      markup += (r.calories    ? format_item('calories', 'Calories', r.calories) : '');
+      markup += (r.fat         ? format_item('fat', 'Fat', r.fat) : '');
+      markup += (r.protein     ? format_item('protein', 'Protein', r.protein) : '');
+      markup += '</div>';
+    }
+    return markup;
+    
+  }
+  
   
 // Add Restrictions, Yield, Author, and Published (date) into first parameter, 
 // an object which gets passed in this function.
@@ -277,11 +355,16 @@
     HRecipeOutput += (r.cooktime    ? format_time(r.cooktime, 'cooktime', 'Cooking time') : '');
     
     HRecipeOutput += (r.diettype    ? format_item('diettype', 'Diet type', r.diettype) : '');
-    HRecipeOutput += (r.dietother   ? format_item('dietother', 'Diet (other)', r.dietother) : '');
+    HRecipeOutput += (r.dietother   ? format_item('dietother', 'Diet tags', r.dietother) : '');
     HRecipeOutput += (r.restriction ? format_item('restriction', 'Dietary restriction', r.restriction) : '');
     HRecipeOutput += (r.servings    ? format_item('yield', 'Number of servings (yield)', r.servings) : '');
-    HRecipeOutput += (r.mealtype    ? format_item('mealtype', 'Meal type', r.mealtype) : '');
+    HRecipeOutput += (r.mealtype    ? format_item('recipeType', 'Meal type', r.mealtype) : '');
     HRecipeOutput += (r.tradition   ? format_item('tradition', 'Culinary tradition', r.tradition) : '');
+
+
+    // These need to be pushed into 
+    HRecipeOutput += hrecipe_format_nutrition(r);
+
 
     HRecipeOutput += (r.rating      ? google_compliant_rating(r.rating) : '');
 
@@ -333,5 +416,84 @@
       edInsertContent(edCanvas, HRecipeOutput);
     }
   } // End edInsertHRecipeDone()
+
+
+
+jQuery(document).ready(function() {
+
+  jQuery(".hrecipe-ujs").click(function() {
+
+   //alert("In UJS");
+
+   r = new recipe();
+   r["name"] = document.getElementById('item-name').value;
+
+   if ("" === r["name"]) {
+      alert("You need to provide a name for the recipe.");
+      return false;
+   }
+
+   r["url"] = document.getElementById('item-url').value;
+   r["summary"] = document.getElementById('item-summary').value;
+   r["ingredients"] = document.getElementById('item-ingredients').value;
+   r["description"] = document.getElementById('item-description').value;
+   
+   r["quicknotes"] = document.getElementById('item-quicknotes').value;
+   r["variations"] = document.getElementById('item-variations').value;
+       
+   r["tradition"] = getSelectValue('item-culinarytradition');
+   r["rating"] = getSelectValue('item-rating');
+
+   // When this id doesn't exist, call fails.
+   //r["duration"] = document.getElementById('item-duration').value;
+   r["preptime"] = document.getElementById('item-preptime').value;
+   r["cooktime"] = document.getElementById('item-cooktime').value;
+
+   r["diettype"] = getSelectValue('item-diettype');
+   r["recipetype"] = getSelectValue('item-recipetype');
+   r["dietother"] = getCheckedValues();
+   r["restriction"] = document.getElementById('item-dietrestriction').value; 
+   r["servings"] = document.getElementById('item-servings').value; 
+
+   r["calories"] = document.getElementById('item-calories').value; 
+   r["fat"] = document.getElementById('item-fat').value; 
+   r["protein"] = document.getElementById('item-protein').value; 
+
+   
+   window.parent.edInsertHRecipeDone(r);
+
+  });
+  
+  //Default Action
+  jQuery(".tab_content").hide(); //Hide all content
+  jQuery("ul.tabs li:first a").addClass("current").show(); //Activate first tab
+  jQuery(".tab_content:first").show(); //Show first tab content
+  
+  //On Click Event for the sidemenu across the media popup
+  jQuery("ul.tabs li a").click(function() {
+    jQuery("ul.tabs li a").removeClass("current"); 
+    jQuery(this).addClass("current"); 
+    jQuery(".tab_content").hide(); //Hide all tab content
+    var activeTab = jQuery(this).attr("href"); //Find the rel attribute value to identify the active tab + content
+    jQuery(activeTab).fadeIn(); //Fade in the active content
+    return false;
+  });
+
+  
+    // Handle the bottom tabs.
+  jQuery("ul.tabs li.btmtabs a").click(function() {
+    //alert("Bottom tab clicked " + this);
+    var activeTab = jQuery(this).attr("href"); //Find the rel attribute value to identify the active tab + content
+    //alert("Active tab: " + activeTab);
+    jQuery("ul.tabs li a").removeClass("current"); 
+    //alert("ul.tabs li a."+activeTab.substring(1));
+    jQuery("ul.tabs li a."+activeTab.substring(1)).addClass("current"); 
+    jQuery(".tab_content").hide(); //Hide all tab content
+    jQuery(activeTab).fadeIn(); //Fade in the active content
+    return false;
+  });
+  
+});
+
 
 //})();
