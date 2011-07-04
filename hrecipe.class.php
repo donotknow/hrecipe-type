@@ -353,10 +353,10 @@ class hrecipe extends PluginBase {
                 $content .= '<p>'.$info['summary'].'</p>';
 
             if ($info['ingredients'])
-                $content .= '<h3>Ingredients</h3>'.$info['ingredients'];
+                $content .= '<div class="ingredients"><h3>Ingredients</h3>'.$info['ingredients'].'</div>';
 
             if ($info['instructions'])
-                $content .= '<h3>Method</h3>'.$info['instructions'];
+                $content .= '<div class="method"><h3>Method</h3>'.$info['instructions'].'</div>';
 
             $content .= $c;
         }
