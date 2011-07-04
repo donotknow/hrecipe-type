@@ -1,10 +1,17 @@
+= hRecipe Type 0.2.1 =
+* Renamed plugin to 'hRecipe Type' and updated other meta info.
+* Added custom post type for recipes.
+* Added custom taxonomy for recipes.
+* Added custom meta boxes to recipes.
+* Custom formatting for to comply with the hRecipe microformat.
+* Added default template for the recipe custom post type.
 
 
-= hRecipe 0.2 =	
+= hRecipe 0.2 =
 * Fixed recipe label in editor.
-* Changed enclosing block to fieldset element.	
+* Changed enclosing block to fieldset element.
 * Added "Culinary Tradition" selection.
 
-	
+
 = hRecipe 0.1 =
 * Initial release
