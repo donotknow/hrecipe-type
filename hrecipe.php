@@ -3,7 +3,7 @@
  * Plugin Name: hRecipe Type
  * Plugin URI: https://github.com/donotknow/hrecipe-type
  * Description: hRecipe custom post type to wordpress: Fast and easy recipe formatting for Google Rich Snippet display and better search results click throughs. Leverage your recipe SEO with the hrecipe microformatting! It's easy using hRecipe plugin for WordPress. Visit the plugin home page for tips and techniques on food blogging, SEO and more.
- * Version: 0.5.9.1
+ * Version: 0.6.0
  * Author: Dave Doolin
  * Author URI: http://hrecipe.com/about
  */ 
@@ -35,7 +35,7 @@
    */
 
    
-define('HRECIPE_VERSION', "5.9");   
+define('HRECIPE_VERSION', "0.6.0");   
    
 // Find the full URL to the plugin directory and store it
 // @todo define(HRECIPE_PLUGIN_URL) instead of this.
@@ -55,15 +55,12 @@ if (class_exists('hrecipe')) {
 
 if ( isset ($recipe)) {
 
-    register_activation_hook( __FILE__ , array (&$recipe, 'hrecipe_activate'));
-    register_deactivation_hook( __FILE__ , array (&$recipe, 'hrecipe_deactivate'));
+    register_activation_hook( __FILE__ , array ($recipe, 'hrecipe_activate'));
+    register_deactivation_hook( __FILE__ , array ($recipe, 'hrecipe_deactivate'));
     add_filter('plugin_action_links', 'hrecipe_plugin_links', 10, 2);
     $recipe->init();
 
     add_action('wp_print_styles', array ($recipe, 'add_hrecipe_stylesheet'));
-    // Probably ought to split this out into admin style sheet.
-    add_action('admin_print_styles', array (&$recipe, 'add_hrecipe_stylesheet'));
-    //add_action('hrecipe_admin_print_styles', array (&$recipe, 'add_hrecipe_editor_stylesheet'));
 
     add_action('init', array ($recipe, 'hrecipe_plugin_init'));
     add_action('admin_init', array($recipe, 'register_mysettings'));
@@ -88,9 +85,8 @@ if ( isset ($recipe)) {
         return $links;
     }
 
-
     function media_hrecipe_tb_callback() {
-       include(dirname( __FILE__ ) . '/view/hrecipe_form_body.php');
+        include(dirname( __FILE__ ) . '/view/hrecipe_form_body.php');
     }
 
     function hrecipe_tb_callback1() {

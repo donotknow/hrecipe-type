@@ -2,21 +2,13 @@
 
 include dirname( __FILE__ ).'/plugin_base.php';
 include_once dirname( __FILE__ ).'/models/options_db.php';
-//include dirname( __FILE__ ).'/controller/shortcode.php';
-
 
 $hrecipe_pagehook = null;
 $hrecipe_options_file = 'view/admin/options.php';
-//$hrecipe_options_file = __FILE__;
   
 include('hrecipe_localize_vars.php');
 
 class hrecipe extends PluginBase {
-
-    //var $firephp;
-    
-    //var $hrecipe_options_file = 'hrecipe/view/admin/options2.php';
-    //var $hrecipe_options_file = __FILE__;
 
     var $meta_box = array(
         'id' => 'recipe-info',
@@ -93,10 +85,10 @@ class hrecipe extends PluginBase {
     }
 
     // Stub
-    function hrecipe_uninstall() {
-      
+    function hrecipe_uninstall() {      
       //hrecipe_delete_options();
     }
+
 
     function hrecipe_plugin_init() {
 
@@ -113,7 +105,9 @@ class hrecipe extends PluginBase {
         wp_register_script('hrecipeformat',plugins_url('hrecipe/js/hrecipe_format.js', dirname(__FILE__)),'','',true);
         wp_register_script('hrecipelaunch',plugins_url('hrecipe/js/hrecipe_launch.js', dirname(__FILE__)),'','',true);
         wp_register_script('hrecipescript',plugins_url('hrecipe/js/hrecipescript.js', dirname(__FILE__)),'','',true);
-        wp_register_style('hrecipe_editor_stylesheet',plugins_url('hrecipe/hrecipe-editor.css', dirname(__FILE__)),'','');
+        wp_register_style('hrecipe_display_stylesheet',plugins_url('hrecipe/css/hrecipe.css', dirname(__FILE__)),'','');
+        wp_register_style('hrecipe_editor_stylesheet',plugins_url('hrecipe/css/hrecipe-editor.css', dirname(__FILE__)),'','');
+        wp_register_style('hrecipe_options_stylesheet',plugins_url('hrecipe/css/hrecipe-options.css', dirname(__FILE__)),'','');
 
         wp_enqueue_script('hrecipeformat');
         //wp_enqueue_script('hrecipescript');
@@ -135,15 +129,19 @@ class hrecipe extends PluginBase {
         add_action('template_redirect', array($this, 'recipe_template_redirect'), 5);
     }
 
+    function add_hrecipe_stylesheet() {
+        wp_enqueue_style('hrecipe_display_stylesheet');
+    }
 
-   function hrecipe_admin_init() {
-      
+    function hrecipe_admin_init() {
+
         wp_enqueue_script('hrecipeformat');
         wp_enqueue_script('hrecipelaunch');
         wp_enqueue_style('hrecipe_editor_stylesheet');
+        wp_enqueue_style('hrecipe_options_stylesheet');
     }
-    
-    
+
+
     function register_mysettings() {
 
        global $hrecipe_options_file;
@@ -153,7 +151,10 @@ class hrecipe extends PluginBase {
         add_settings_section('hrecipe_structure', '', 'hrecipe_structure_text', $hrecipe_options_file);        
 
         add_settings_section('hrecipe_styling', '', array($this,'hrecipe_styling_text'), $hrecipe_options_file);
-        add_settings_field('hrecipe_custom_style', __('Custom CSS class', 'hrecipe'), array($this,'custom_style'), $hrecipe_options_file, 'hrecipe_styling');        
+        add_settings_field('hrecipe_custom_style', __('Custom CSS class', 'hrecipe'), array($this,'custom_style'), $hrecipe_options_file, 'hrecipe_styling');
+        // Testing...!!!!
+        //add_settings_field('hrecipe_custom_style', $this->custom_style_label(), array($this,'custom_style'), $hrecipe_options_file, 'hrecipe_styling');        
+
         //add_settings_field('hrecipe_border_color', __('Border color', 'hrecipe'), array($this,'border_color'), $hrecipe_options_file, 'hrecipe_styling');        
         //add_settings_field('hrecipe_background_color', 'Background color', array($this,'background_color'), $hrecipe_options_file, 'hrecipe_styling');        
     }
@@ -373,6 +374,12 @@ class hrecipe extends PluginBase {
         }
     }
 
+  // Check carefully... if this works, all these functions should be 
+  // loaded from a file.
+  function custom_style_label() {
+    return __('Custom CSS class, from a custom function call...', 'hrecipe');
+  }
+
   function custom_style() {
     
     $options = get_option('hrecipe_options');
@@ -487,32 +494,10 @@ class hrecipe extends PluginBase {
         wp_enqueue_script('hrecipeformat');
     }
 
-    // TODO: Schedule for deletion...
-    function add_hrecipe_stylesheet() {
-
-        // TODO: Replace constants with plugins_url()
-        $css_url = WP_PLUGIN_URL.'/hrecipe/hrecipe.css';
-        $css_file = WP_PLUGIN_DIR.'/hrecipe/hrecipe.css';
-        if (file_exists($css_file)) {
-            wp_register_style('hrecipe_stylesheet', $css_url);
-            wp_enqueue_style('hrecipe_stylesheet');
-        }
-    }
 
     // TODO: Schedule for deletion...
     function add_hrecipe_editor_stylesheet() {
-
-       wp_enqueue_style('hrecipe_editor_stylesheet');
-       
-       /*
-        $css_url = WP_PLUGIN_URL.'/hrecipe/hrecipe-editor.css';
-        $css_file = WP_PLUGIN_DIR.'/hrecipe/hrecipe-editor.css';
-        if (file_exists($css_file)) {
-            wp_register_style('hrecipe_editor_stylesheet', $css_url);
-            wp_enqueue_style('hrecipe_editor_stylesheet');
-        }
-        */
-        
+       wp_enqueue_style('hrecipe_editor_stylesheet');        
     }
 
 }
