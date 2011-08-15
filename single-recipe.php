@@ -35,18 +35,18 @@ get_header(); ?>
 
 					<footer class="entry-meta">
 						<ul>
-							<?php if ($info['yield']) : ?><li>
-								<h6><?php _e( 'Yields (servings)', 'fertig' ); ?></h6>
-								<?php print_r($info['yield']); ?>
+							<?php if ($info['yield']) : ?><li class="yield">
+								<h6><?php _e( 'Yields', 'fertig' ); ?></h6>
+								<?php print_r($info['yield']); ?>  servings
 							</li><?php endif; ?>
 
-							<?php if ($info['preptime']) : ?><li>
-								<h6><?php _e( 'Prep time (duration)', 'fertig' ); ?></h6>
+							<?php if ($info['preptime']) : ?><li class="preptime">
+								<h6><?php _e( 'Prep time', 'fertig' ); ?></h6>
 								<?php print_r($info['preptime']); ?>
 							</li><?php endif; ?>
 
-							<?php if ($info['cooktime']) : ?><li>
-								<h6><?php _e( 'Cooking time (duration)', 'fertig' ); ?></h6>
+							<?php if ($info['cooktime']) : ?><li class="cooktime">
+								<h6><?php _e( 'Cook time', 'fertig' ); ?></h6>
 								<?php print_r($info['cooktime']); ?>
 							</li><?php endif; ?>
 
@@ -81,9 +81,9 @@ get_header(); ?>
 								<?php echo $info['url']; ?>
 							</div><?php endif; ?>
 
-							<?php print_r($info['rating']); ?>
-
 						</div><!-- .bar-->
+
+						<?php print_r($info['rating']); ?>
 
 						<ul>
 							<?php the_terms( $post->ID, 'meal', '<li><h6>Meal type</h6>', ', ', ' </li>' ); ?>
