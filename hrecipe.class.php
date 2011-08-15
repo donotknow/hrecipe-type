@@ -120,6 +120,7 @@ class hrecipe extends PluginBase {
 
         // add a filter to the post class and the_content to add hrecipe, the microformat is the whole point!
         add_filter('post_class', array($this, 'recipe_post_class'));
+        add_filter('the_excerpt', array($this, 'recipe_the_excerpt'));
         add_filter('the_content', array($this, 'recipe_the_content'));
 
         // have the new recipe custom post type act like a post (not a page)
@@ -342,6 +343,21 @@ class hrecipe extends PluginBase {
         return $c;
     }
 
+    function recipe_the_excerpt($c) {
+        global $post;
+        $content = $c;
+
+        if ($post->post_type == 'recipe') {
+            $info = recipe_info($post);
+            $content = '';
+
+            if ($info['summary'])
+                $content .= '<p>'.$info['summary'].'</p>';
+        }
+
+        return $content;
+    }
+
     function recipe_the_content($c) {
         global $post;
         $content = $c;
@@ -531,7 +547,12 @@ function recipe_format_duration($totalminutes) {
 
     $value  = '<span class="duration">';
     $value .= '<span class="value-title" title="PT'. $hours .'H'. $minutes .'M">';
-    $value .= $hours .' hour(s) '. $minutes .' minutes';
+    if ($hours > 0) {
+        $value .= $hours .' hour(s) ';
+    }
+    if ($minutes > 0) {
+        $value .= $minutes .' minutes';
+    }
     $value .= '</span></span>';
     return $value;
 }
