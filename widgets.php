@@ -138,7 +138,7 @@ class hRecipe_Tag_Cloud extends WP_Widget {
 
 	function update($new_instance, $old_instance) {
 		$instance = $old_instance;
-		$new_instance = wp_parse_args((array) $new_instance, array('title' => ''));
+		$new_instance = wp_parse_args((array) $new_instance);
 		$instance['title'] = strip_tags($new_instance['title']);
 		return $instance;
 	}
@@ -172,14 +172,6 @@ class hRecipe_Meal_Type_Categories extends hRecipe_Categories {
 		parent::widget($args, $instance, 'meal');
 	}
 
-	function update($new_instance, $old_instance) {
-		parent::update($new_instance, $old_instance);
-	}
-
-	function form($instance) {
-		parent::form($instance);
-	}
-
 }
 
 
@@ -197,14 +189,6 @@ class hRecipe_Diet_Type_Categories extends hRecipe_Categories {
 
 	function widget($args, $instance) {
 		parent::widget($args, $instance, 'diet');
-	}
-
-	function update($new_instance, $old_instance) {
-		parent::update($new_instance, $old_instance);
-	}
-
-	function form($instance) {
-		parent::form($instance);
 	}
 
 }
@@ -226,14 +210,6 @@ class hRecipe_Culinary_Tradition_Categories extends hRecipe_Categories {
 		parent::widget($args, $instance, 'culinary');
 	}
 
-	function update($new_instance, $old_instance) {
-		parent::update($new_instance, $old_instance);
-	}
-
-	function form($instance) {
-		parent::form($instance);
-	}
-
 }
 
 
@@ -251,14 +227,6 @@ class hRecipe_Major_Ingredients_Tag_Cloud extends hRecipe_Tag_Cloud {
 
 	function widget($args, $instance) {
 		parent::widget($args, $instance, 'ingredients');
-	}
-
-	function update($new_instance, $old_instance) {
-		parent::update($new_instance, $old_instance);
-	}
-
-	function form($instance) {
-		parent::form($instance);
 	}
 
 }
