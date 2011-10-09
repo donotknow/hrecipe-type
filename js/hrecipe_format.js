@@ -1,6 +1,6 @@
 
 /*global tb_show, hrecipe_handle, hrecipe_qttoolbar:true, document, newbutton:true, tb_remove, url */
-/*global tinyMCE, edInsertContent, edCanvas */
+/*global edInsertContent, edCanvas */
 
   var hrecipe_from_gui;
 
@@ -409,12 +409,7 @@ function recipe() {}
     HRecipeOutput += '</' + et + '>' + padding;
     //HRecipeOutput += '</div>';
 
-    if (hrecipe_from_gui) {
-      tinyMCE.execInstanceCommand('content', 'mceInsertContent', false, HRecipeOutput);
-      tinyMCE.execCommand('mceCleanup');
-    } else {
-      edInsertContent(edCanvas, HRecipeOutput);
-    }
+    edInsertContent(edCanvas, HRecipeOutput);
   } // End edInsertHRecipeDone()
 
 

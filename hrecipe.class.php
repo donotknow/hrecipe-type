@@ -93,11 +93,6 @@ class hrecipe extends PluginBase {
 
     function hrecipe_plugin_init() {
 
-        if (get_user_option('rich_editing') == 'true') {
-            // Include hooks for TinyMCE plugin
-            add_filter('mce_external_plugins', array($this, 'hrecipe_plugin_mce_external_plugins'));
-            add_filter('mce_buttons_3', array($this, 'hrecipe_plugin_mce_buttons'));
-        }
         global $hrecipe_plugin_url;
         load_plugin_textdomain('hrecipe', $hrecipe_plugin_url.'/lang', 'hrecipe/lang');
         
@@ -485,21 +480,6 @@ class hrecipe extends PluginBase {
         } else {
             include ('view/admin/options.php');
         }
-    }
-
-
-    function hrecipe_plugin_mce_external_plugins($plugins) {
-
-        global $hrecipe_plugin_url;
-        $plugins['hrecipe_plugin'] = $hrecipe_plugin_url.'/tinymceplugin/editor_plugin.js';
-        return $plugins;
-    }
-
-
-    function hrecipe_plugin_mce_buttons($buttons) {
-
-        array_push($buttons, 'hrecipe_button');
-        return $buttons;
     }
 
 

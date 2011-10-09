@@ -6,7 +6,6 @@
   // TODO: rename these next two functions appropriately.
   function edInsertHRecipe() {
     tb_show("Add an hRecipe", 'media-upload.php?type=hrecipe&tab=hrecipe&amp;TB_iframe=true');
-    hrecipe_from_gui = true; // Called from TinyMCE
   }
 
 
