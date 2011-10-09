@@ -2,6 +2,7 @@
 
 include dirname( __FILE__ ).'/plugin_base.php';
 include_once dirname( __FILE__ ).'/models/options_db.php';
+include_once dirname( __FILE__ ).'/widgets.php';
 
 $hrecipe_pagehook = null;
 $hrecipe_options_file = 'view/admin/options.php';
@@ -611,6 +612,5 @@ function recipe_info() {
 
 function recipe_meta() {
 }
-
 
 ?>
