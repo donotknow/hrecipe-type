@@ -60,11 +60,8 @@ if ( isset ($recipe)) {
     add_filter('plugin_action_links', 'hrecipe_plugin_links', 10, 2);
     $recipe->init();
 
-    add_action('wp_print_styles', array ($recipe, 'add_hrecipe_stylesheet'));
-
     add_action('init', array ($recipe, 'hrecipe_plugin_init'));
     add_action('admin_init', array($recipe, 'register_mysettings'));
-    add_action('admin_init', array($recipe, 'hrecipe_admin_init'));
     add_action('admin_menu', array ($recipe, 'hrecipe_plugin_menu'));
 
    /**
