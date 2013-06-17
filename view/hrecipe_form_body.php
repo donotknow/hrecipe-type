@@ -1,5 +1,3 @@
-
-
 <div id="media-upload-header">
   
     <ul id="sidemenu" class="tabs">
