@@ -139,7 +139,8 @@ class hrecipe extends PluginBase {
     function recipe_template_redirect() {
         $post_type = get_query_var('post_type');
         if ($post_type == 'recipe') {  // check your post type
-            if (file_exists(TEMPLATEPATH.'/single-' . $post_type . '.php')) return;
+            $template_dir = get_stylesheet_directory();
+            if (file_exists($template_dir.'/single-' . $post_type . '.php')) return;
             load_template(dirname( __FILE__ ).'/single-recipe.php');
             exit;
         }
