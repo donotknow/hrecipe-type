@@ -22,136 +22,282 @@ function hrecipe_load_widgets() {
  */
 class hRecipe_Categories extends WP_Widget {
 
-	function __construct($id_base, $name, $widget_ops, $control_ops) {
-		$id_base = 'hrecipe_'.$id_base;
+	public function __construct($id_base, $name, $widget_ops, $control_ops) {
+		$id_base                  = 'hrecipe_' . $id_base;
 		$widget_ops['classname'] .= ' widget_categories';
-		$control_ops['id_base'] = 'hrecipe_'.$control_ops['id_base'];
+		$control_ops['id_base']   = 'hrecipe_'.$control_ops['id_base'];
 		parent::__construct($id_base, $name, $widget_ops, $control_ops);
 	}
 
-	function widget($args, $instance, $taxonomy) {
-		extract($args);
+	public function widget( $args, $instance ) {
+		$title = ! empty( $instance['title'] ) ? $instance['title'] : __( 'Categories', 'custom-post-type-widgets' );
 
-		$title = apply_filters('widget_title', $instance['title'], $instance, $this->id_base);
-		$c = $instance['count'] ? '1' : '0';
-		$h = $instance['hierarchical'] ? '1' : '0';
-		$d = $instance['dropdown'] ? '1' : '0';
+		/** This filter is documented in wp-includes/widgets/class-wp-widget-pages.php */
+		$title = apply_filters( 'widget_title', $title, $instance, $this->id_base );
 
-		echo $before_widget;
-		if ($title)
-			echo $before_title . $title . $after_title;
+		$taxonomy = ! empty( $instance['taxonomy'] ) ? $instance['taxonomy'] : 'category';
+		$c        = ! empty( $instance['count'] ) ? (bool) $instance['count'] : false;
+		$h        = ! empty( $instance['hierarchical'] ) ? (bool) $instance['hierarchical'] : false;
+		$d        = ! empty( $instance['dropdown'] ) ? (bool) $instance['dropdown'] : false;
 
-		$cat_args = array('taxonomy' => $taxonomy, 'orderby' => 'name', 'show_count' => $c, 'hierarchical' => $h);
+		echo $args['before_widget'];
+		if ( $title ) {
+			echo $args['before_title'] . $title . $args['after_title'];
+		}
 
-		if ($d) {
-			$cat_args['show_option_none'] = __('Select');
-			wp_dropdown_categories(apply_filters('widget_categories_dropdown_args', $cat_args));
+		$cat_args = array(
+			'orderby'      => 'name',
+			'taxonomy'     => $taxonomy,
+			'show_count'   => $c,
+			'hierarchical' => $h,
+		);
+
+		if ( $d ) {
+			$dropdown_id = "{$this->id_base}-dropdown-{$this->number}";
+
+			echo '<label class="screen-reader-text" for="' . esc_attr( $dropdown_id ) . '">' . $title . '</label>';
+
+			$cat_args['show_option_none'] = __( 'Select Category', 'custom-post-type-widgets' );
+			$cat_args['name']             = 'category' === $taxonomy ? 'category_name' : $taxonomy;
+			$cat_args['id']               = $dropdown_id;
+			$cat_args['value_field']      = 'slug';
 ?>
 
-<script type='text/javascript'>
+<form action="<?php echo esc_url( home_url() ); ?>" method="get">
+			<?php
+			wp_dropdown_categories(
+				apply_filters(
+					'custom_post_type_widgets/categories/widget_categories_dropdown_args',
+					$cat_args,
+					$instance,
+					$this->id,
+					$taxonomy
+				)
+			);
+			?>
+</form>
+<script>
 /* <![CDATA[ */
-	var dropdown = document.getElementById("cat");
+(function() {
+	var dropdown = document.getElementById( "<?php echo esc_js( $dropdown_id ); ?>" );
 	function onCatChange() {
-		if (dropdown.options[dropdown.selectedIndex].value > 0) {
-			location.href = "<?php echo home_url(); ?>/?cat="+dropdown.options[dropdown.selectedIndex].value;
+		if ( dropdown.options[dropdown.selectedIndex].value ) {
+			return dropdown.form.submit();
 		}
 	}
 	dropdown.onchange = onCatChange;
+})();
 /* ]]> */
 </script>
-
 <?php
-		} else {
+		}
+		else {
 ?>
 		<ul>
 <?php
-		$cat_args['title_li'] = '';
-		wp_list_categories(apply_filters('widget_categories_args', $cat_args));
+			$cat_args['title_li'] = '';
+			wp_list_categories(
+				apply_filters(
+					'custom_post_type_widgets/categories/widget_categories_args',
+					$cat_args,
+					$instance,
+					$this->id,
+					$taxonomy
+				)
+			);
 ?>
 		</ul>
 <?php
 		}
 
-		echo $after_widget;
+		echo $args['after_widget'];
 	}
 
-	function update($new_instance, $old_instance) {
-		$instance = $old_instance;
-		$instance['title'] = strip_tags($new_instance['title']);
-		$instance['count'] = !empty($new_instance['count']) ? 1 : 0;
-		$instance['hierarchical'] = !empty($new_instance['hierarchical']) ? 1 : 0;
-		$instance['dropdown'] = !empty($new_instance['dropdown']) ? 1 : 0;
+	public function update( $new_instance, $old_instance ) {
+		$instance                 = $old_instance;
+		$instance['title']        = sanitize_text_field( $new_instance['title'] );
+		$instance['taxonomy']     = stripslashes( $new_instance['taxonomy'] );
+		$instance['count']        = ! empty( $new_instance['count'] ) ? (bool) $new_instance['count'] : false;
+		$instance['hierarchical'] = ! empty( $new_instance['hierarchical'] ) ? (bool) $new_instance['hierarchical'] : false;
+		$instance['dropdown']     = ! empty( $new_instance['dropdown'] ) ? (bool) $new_instance['dropdown'] : false;
 
 		return $instance;
 	}
 
-	function form($instance) {
-		$instance = wp_parse_args((array) $instance, array('title' => ''));
-		$title = esc_attr($instance['title']);
-		$count = isset($instance['count']) ? (bool) $instance['count'] :false;
-		$hierarchical = isset($instance['hierarchical']) ? (bool) $instance['hierarchical'] : false;
-		$dropdown = isset($instance['dropdown']) ? (bool) $instance['dropdown'] : false;
+	public function form( $instance ) {
+		$title        = isset( $instance['title'] ) ? $instance['title'] : '';
+		$taxonomy     = isset( $instance['taxonomy'] ) ? $instance['taxonomy'] : '';
+		$count        = isset( $instance['count'] ) ? (bool) $instance['count'] : false;
+		$hierarchical = isset( $instance['hierarchical'] ) ? (bool) $instance['hierarchical'] : false;
+		$dropdown     = isset( $instance['dropdown'] ) ? (bool) $instance['dropdown'] : false;
 ?>
-		<p><label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:'); ?></label>
-		<input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo $title; ?>" /></p>
+		<p><label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php esc_html_e( 'Title:', 'custom-post-type-widgets' ); ?></label>
+		<input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>" /></p>
 
-		<p><input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id('dropdown'); ?>" name="<?php echo $this->get_field_name('dropdown'); ?>"<?php checked($dropdown); ?> />
-		<label for="<?php echo $this->get_field_id('dropdown'); ?>"><?php _e('Display as dropdown'); ?></label><br />
+		<?php
+		$taxonomies = get_taxonomies( '', 'objects' );
 
-		<input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id('count'); ?>" name="<?php echo $this->get_field_name('count'); ?>"<?php checked($count); ?> />
-		<label for="<?php echo $this->get_field_id('count'); ?>"><?php _e('Show post counts'); ?></label><br />
+		if ( $taxonomies ) {
+			printf(
+				'<p><label for="%1$s">%2$s</label>' .
+				'<select class="widefat" id="%1$s" name="%3$s">',
+				$this->get_field_id( 'taxonomy' ),
+				__( 'Taxonomy:', 'custom-post-type-widgets' ),
+				$this->get_field_name( 'taxonomy' )
+			);
 
-		<input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id('hierarchical'); ?>" name="<?php echo $this->get_field_name('hierarchical'); ?>"<?php checked($hierarchical); ?> />
-		<label for="<?php echo $this->get_field_id('hierarchical'); ?>"><?php _e('Show hierarchy'); ?></label></p>
+			foreach ( $taxonomies as $taxobjects => $value ) {
+				if ( ! $value->hierarchical ) {
+					continue;
+				}
+				if ( 'nav_menu' === $taxobjects || 'link_category' === $taxobjects || 'post_format' === $taxobjects ) {
+					continue;
+				}
+
+				printf(
+					'<option value="%s"%s>%s</option>',
+					esc_attr( $taxobjects ),
+					selected( $taxobjects, $taxonomy, false ),
+					__( $value->label, 'custom-post-type-widgets' ) . ' ' . $taxobjects
+				);
+			}
+			echo '</select></p>';
+		}
+		?>
+
+		<p><input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id( 'dropdown' ); ?>" name="<?php echo $this->get_field_name( 'dropdown' ); ?>"<?php checked( $dropdown ); ?> />
+		<label for="<?php echo $this->get_field_id( 'dropdown' ); ?>"><?php esc_html_e( 'Display as dropdown', 'custom-post-type-widgets' ); ?></label><br />
+
+		<input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id( 'count' ); ?>" name="<?php echo $this->get_field_name( 'count' ); ?>"<?php checked( $count ); ?> />
+		<label for="<?php echo $this->get_field_id( 'count' ); ?>"><?php esc_html_e( 'Show post counts', 'custom-post-type-widgets' ); ?></label><br />
+
+		<input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id( 'hierarchical' ); ?>" name="<?php echo $this->get_field_name( 'hierarchical' ); ?>"<?php checked( $hierarchical ); ?> />
+		<label for="<?php echo $this->get_field_id( 'hierarchical' ); ?>"><?php esc_html_e( 'Show hierarchy', 'custom-post-type-widgets' ); ?></label></p>
 <?php
 	}
-
 }
 
 
 
 /**
- * Custom taxonomy tag cloud widgets
+ * Custom taxonomy tag widgets (tag cloud)
  */
 class hRecipe_Tag_Cloud extends WP_Widget {
-
-	function __construct($id_base, $name, $widget_ops, $control_ops) {
+	public function __construct($id_base, $name, $widget_ops, $control_ops) {
 		$id_base = 'hrecipe_'.$id_base;
 		$widget_ops['classname'] .= ' widget_tagcloud';
 		$control_ops['id_base'] = 'hrecipe_'.$control_ops['id_base'];
 		parent::__construct($id_base, $name, $widget_ops, $control_ops);
 	}
 
-	function widget($args, $instance, $taxonomy) {
-		extract($args);
-		$title = apply_filters('widget_title', $instance['title'], $instance, $this->id_base);
+	public function widget( $args, $instance ) {
+		$taxonomy   = $this->get_taxonomy( $instance );
+		$show_count = ! empty( $instance['count'] );
 
-		echo $before_widget;
-		if ($title)
-			echo $before_title . $title . $after_title;
+		if ( ! empty( $instance['title'] ) ) {
+			$title = $instance['title'];
+		} else {
+			if ( 'post_tag' === $taxonomy ) {
+				$title = __( 'Tags', 'custom-post-type-widgets' );
+			} else {
+				$tax   = get_taxonomy( $taxonomy );
+				$title = $tax->labels->name;
+			}
+		}
 
-		// use tag cloud for this custom taxonomy
-		wp_tag_cloud(array('taxonomy' => $taxonomy));
+		$tag_cloud = wp_tag_cloud(
+			apply_filters(
+				'custom_post_type_widgets/tag_cloud/widget_tag_cloud_args',
+				array(
+					'taxonomy'   => $taxonomy,
+					'echo'       => false,
+					'show_count' => $show_count,
+				),
+				$instance,
+				$this->id,
+				$taxonomy
+			)
+		);
 
-		echo $after_widget;
+		if ( empty( $tag_cloud ) ) {
+			return;
+		}
+
+		$title = apply_filters( 'widget_title', $title, $instance, $this->id_base );
+
+		echo $args['before_widget'];
+		if ( $title ) {
+			echo $args['before_title'] . $title . $args['after_title'];
+		}
+		echo '<div class="tagcloud">';
+		echo $tag_cloud;
+		echo '</div>';
+		echo $args['after_widget'];
 	}
 
-	function update($new_instance, $old_instance) {
-		$instance = $old_instance;
-		$new_instance = wp_parse_args((array) $new_instance);
-		$instance['title'] = strip_tags($new_instance['title']);
+	public function update( $new_instance, $old_instance ) {
+		$instance             = $old_instance;
+		$instance['title']    = sanitize_text_field( $new_instance['title'] );
+		$instance['taxonomy'] = stripslashes( $new_instance['taxonomy'] );
+		$instance['count']    = ! empty( $new_instance['count'] ) ? (bool) $new_instance['count'] : false;
+
 		return $instance;
 	}
 
-	function form($instance) {
-		$instance = wp_parse_args((array) $instance, array('title' => ''));
-		$title = $instance['title'];
+	public function form( $instance ) {
+		$title    = isset( $instance['title'] ) ? $instance['title'] : '';
+		$taxonomy = isset( $instance['taxonomy'] ) ? $instance['taxonomy'] : 'post_tag';
+		$count    = isset( $instance['count'] ) ? (bool) $instance['count'] : false;
 ?>
-		<p><label>
-			<?php _e('Title:'); ?>
-			<input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo esc_attr($title); ?>" />
-		</label></p>
-<?php
+		<p><label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php esc_html_e( 'Title:', 'custom-post-type-widgets' ); ?></label>
+		<input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>" /></p>
+
+		<?php
+		$taxonomies = get_taxonomies( array( 'show_tagcloud' => true ), 'objects' );
+		if ( $taxonomies ) {
+			printf(
+				'<p><label for="%1$s">%2$s</label>' .
+				'<select class="widefat" id="%1$s" name="%3$s">',
+				$this->get_field_id( 'taxonomy' ),
+				__( 'Taxonomy:', 'custom-post-type-widgets' ),
+				$this->get_field_name( 'taxonomy' )
+			);
+
+			foreach ( $taxonomies as $taxobjects => $value ) {
+				if ( ! $value->show_tagcloud || empty( $value->labels->name ) ) {
+					continue;
+				}
+				if ( $value->hierarchical ) {
+					continue;
+				}
+				if ( 'nav_menu' === $taxobjects || 'link_category' === $taxobjects || 'post_format' === $taxobjects ) {
+					continue;
+				}
+
+				printf(
+					'<option value="%s"%s>%s</option>',
+					esc_attr( $taxobjects ),
+					selected( $taxobjects, $taxonomy, false ),
+					__( $value->label, 'custom-post-type-widgets' ) . ' ' . $taxobjects
+				);
+			}
+			echo '</select></p>';
+?>
+			<p><input class="checkbox" type="checkbox" <?php checked( $count ); ?> id="<?php echo $this->get_field_id( 'count' ); ?>" name="<?php echo $this->get_field_name( 'count' ); ?>" />
+			<label for="<?php echo $this->get_field_id( 'count' ); ?>"><?php esc_html_e( 'Show tag counts', 'custom-post-type-widgets' ); ?></label></p>
+		<?php
+		}
+		else {
+			echo '<p>' . __( 'The tag cloud will not be displayed since there are no taxonomies that support the tag cloud widget.', 'custom-post-type-widgets' ) . '</p>';
+		}
+	}
+
+	public function get_taxonomy( $instance ) {
+		if ( ! empty( $instance['taxonomy'] ) && taxonomy_exists( $instance['taxonomy'] ) ) {
+			return $instance['taxonomy'];
+		}
+
+		return 'post_tag';
 	}
 }
 
@@ -232,5 +378,3 @@ class hRecipe_Major_Ingredients_Tag_Cloud extends hRecipe_Tag_Cloud {
 }
 
 
-
-?>
